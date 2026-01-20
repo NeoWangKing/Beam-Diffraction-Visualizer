@@ -6,27 +6,10 @@ This project is a graphical user interface (GUI) application designed to visuali
 
 ```
 beam-diffraction-visualizer
-├── src
-│   ├── main.py            # Entry point of the application
-│   ├── gui                # Contains GUI components
-│   │   ├── __init__.py    # Initializes the gui module
-│   │   ├── app.py         # Main application class
-│   │   ├── sliders.py      # Slider components for parameter adjustments
-│   │   ├── dropdowns.py    # Dropdown components for beam and aperture selection
-│   │   └── canvas.py       # Canvas for drawing diffraction images
-│   ├── core               # Contains core functionality
-│   │   ├── __init__.py    # Initializes the core module
-│   │   ├── beam.py        # Defines beam types and their properties
-│   │   ├── aperture.py     # Defines aperture types and their properties
-│   │   └── diffraction.py   # Handles diffraction calculations
-│   ├── utils              # Utility functions
-│   │   ├── __init__.py    # Initializes the utils module
-│   │   └── helpers.py      # Helper functions for data processing and image updates
-│   └── assets             # Contains assets like styles
-│       └── styles.css      # Stylesheet for the application
-├── requirements.txt       # Lists required Python libraries and dependencies
+├── .git
+├── main.py
+main file
 ├── README.md              # Documentation and usage instructions
-└── .gitignore             # Specifies files and directories to ignore in version control
 ```
 
 ## Features
