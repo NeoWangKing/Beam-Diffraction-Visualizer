@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 #create a basic Beam class
 class Beam:
-    def __init__(self, range=1., resolution=1024):
+    def __init__(self, range=1e-3, resolution=1024):
         self.range = range
         self.resolution = resolution
         pass
@@ -74,7 +74,14 @@ class G_Beam(Beam):
     
 
 if __name__ == "__main__":
-    Beam = G_Beam()
-    Beam.rasterized_Beam()
-    Beam.plot_intensity()
+    range = 1e-3
+    resolution = 1024
+    w0=1e-3
+    lam=632.8e-9
+    z=0.
+    phi=0.
+    Beam = G_Beam(range=range, resolution=resolution, w0=w0, lam=lam)
+    Beam.rasterized_Beam(z=z, phi=phi)
+    Beam.plot_intensity(z=z, phi=phi)
+    Beam.plot_phase(z=z, phi=phi)
     pass
