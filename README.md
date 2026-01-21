@@ -14,7 +14,7 @@ instructions
 
 ## Features
 
-- **Beam Types**: Supports various beam types including Gaussian beam. Will support various beam types including elliptical Gaussian beam, and Laguerre-Gaussian beam.
+- **Beam Types**: Supports various beam types including Gaussian beam, Laguerre-Gaussian beam. Will support various beam types including elliptical Gaussian beam.
 
 ## Installation(this part haven't been written yet)
 
