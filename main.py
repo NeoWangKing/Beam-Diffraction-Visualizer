@@ -25,7 +25,7 @@ class Beam:
 
         phase = 0 * X * Y
 
-        Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0) * exp(1j * phase)
+        Beam = (self.z**0) * exp(1j * phase)
 
         return Beam
     
@@ -46,7 +46,7 @@ class Beam:
 
         plt.imshow(self.phase, extent=(-self.range, self.range, -self.range, self.range), cmap='gray')
         plt.colorbar(label='Phase')
-
+        plt.clim(0, 2 * np.pi)
         plt.title('LG Beam Phase Distribution')
         plt.xlabel('x (m)')
         plt.ylabel('y (m)')
@@ -126,6 +126,14 @@ class LG_Beam(Beam):
     
 
 if __name__ == "__main__":
+    range = 2e-3
+    resolution = 1024
+    lam=632.8e-9
+    z=0.
+    Beam = Beam(range=range, resolution=resolution, z=z, lam=lam)
+    Beam.rasterized_Beam()
+    Beam.plot_intensity()
+    Beam.plot_phase()
     
     range = 2e-3
     resolution = 1024
