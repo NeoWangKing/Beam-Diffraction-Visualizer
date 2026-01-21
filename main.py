@@ -53,8 +53,8 @@ class Beam:
         
         plt.show()
 
-#create the G_Beam class
-class G_Beam(Beam):
+#create the Gaussian_Beam class
+class Gaussian_Beam(Beam):
     def __init__(self, range=1e-3, resolution=1024, z=0., lam=632.8e-9, w0=1e-3):
         super().__init__(range, resolution, z, lam)
 
@@ -89,7 +89,7 @@ class G_Beam(Beam):
 
         return Beam
 
-class LG_Beam(Beam):
+class Laguerre_Gaussian_Beam(Beam):
     def __init__(self, range=0.001, resolution=1024, z=0, lam=6.328e-7, l=1, p=0, w0=1e-3):
         super().__init__(range, resolution, z, lam)
 
@@ -140,10 +140,10 @@ if __name__ == "__main__":
     w0=1e-3
     lam=632.8e-9
     z=0.
-    G_Beam = G_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam)
-    G_Beam.rasterized_Beam()
-    G_Beam.plot_intensity()
-    G_Beam.plot_phase()
+    Gaussian_Beam = Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam)
+    Gaussian_Beam.rasterized_Beam()
+    Gaussian_Beam.plot_intensity()
+    Gaussian_Beam.plot_phase()
 
     range = 2e-3
     resolution = 1024
@@ -152,8 +152,8 @@ if __name__ == "__main__":
     z=0.
     l = 3
     p = 0
-    LG_Beam = LG_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam, l=l, p=p)
-    LG_Beam.rasterized_Beam()
-    LG_Beam.plot_intensity()
-    LG_Beam.plot_phase()
+    Laguerre_Gaussian_Beam = Laguerre_Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam, l=l, p=p)
+    Laguerre_Gaussian_Beam.rasterized_Beam()
+    Laguerre_Gaussian_Beam.plot_intensity()
+    Laguerre_Gaussian_Beam.plot_phase()
     pass
