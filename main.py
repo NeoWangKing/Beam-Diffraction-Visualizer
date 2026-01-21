@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.special import genlaguerre
 
 def fact(n):
-    if n == 0 or n == 1:
+    if n == 0:
         return 1
     else:
         return n * fact(n - 1)
@@ -23,12 +23,15 @@ class Beam:
         y = np.linspace(-self.range, self.range, self.resolution)
         X, Y = np.meshgrid(x, y)
 
-        Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0)
+        phase = 0 * X * Y
+
+        Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0) * exp(1j * phase)
 
         return Beam
     
     def plot_intensity(self):
-        self.intensity = np.abs(self.rasterized_Beam())**2
+        self.Beam = self.rasterized_Beam()
+        self.intensity = np.abs(self.Beam)**2
 
         plt.imshow(self.intensity, extent=(-self.range, self.range, -self.range, self.range), cmap='inferno')
         plt.colorbar(label='Intensity', extend='max')
@@ -43,7 +46,7 @@ class Beam:
 
         plt.imshow(self.phase, extent=(-self.range, self.range, -self.range, self.range), cmap='gray')
         plt.colorbar(label='Phase')
-        plt.clim(0, 2 * np.pi)
+
         plt.title('LG Beam Phase Distribution')
         plt.xlabel('x (m)')
         plt.ylabel('y (m)')
@@ -56,8 +59,6 @@ class G_Beam(Beam):
         super().__init__(range, resolution, z, lam)
 
         self.w0 = w0
-        self.k = 2 * np.pi / self.lam
-        self.z_R = self.k * (self.w0**2) / 2
         
         self.Beam = self.rasterized_Beam()
         pass
@@ -66,18 +67,25 @@ class G_Beam(Beam):
         x = np.linspace(-self.range, self.range, self.resolution)
         y = np.linspace(-self.range, self.range, self.resolution)
         X, Y = np.meshgrid(x, y)
-        self.phi = np.arctan(X / Y)
+        self.phi = np.angle(X + 1j * Y)
+        self.k = 2 * np.pi / self.lam
+        self.z_R = self.k * (self.w0**2) / 2
 
         if self.z==0:
-            Beam = exp(-(X**2 + Y**2) / self.w0**2) * exp(1j*(self.k * self.z - self.phi))
+            phase = (self.k * self.z - self.phi) * (X / X)
+
+            Beam = exp(-(X**2 + Y**2) / self.w0**2) * exp(1j * phase)
         elif self.z>0:
             self.R = self.z_R * ((self.z / self.z_R) + (self.z_R / self.z))
         
             self.w = self.w0 * np.sqrt(1 + (self.z / self.z_R)**2)
 
-            Beam = (self.w0 / self.w) * exp(-(X**2 + Y**2) / self.w**2) * exp(1j * (self.k * (X**2 + Y**2) / (2 * self.R) - self.phi + self.k * self.z))
+            phase = (self.k * (X**2 + Y**2) / (2 * self.R) - self.phi + self.k * self.z)
+
+            Beam = (self.w0 / self.w) * exp(-(X**2 + Y**2) / self.w**2) * exp(1j * phase)
         else:
-            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0)
+            phase = 0
+            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0) * exp(1j * phase)
 
         return Beam
 
@@ -88,8 +96,6 @@ class LG_Beam(Beam):
         self.l = l
         self.p = p
         self.w0 = w0
-        self.k = 2 * np.pi / self.lam
-        self.z_R = self.k * (self.w0**2) / 2
         
         self.Beam = self.rasterized_Beam()
         pass
@@ -98,32 +104,34 @@ class LG_Beam(Beam):
         x = np.linspace(-self.range, self.range, self.resolution)
         y = np.linspace(-self.range, self.range, self.resolution)
         X, Y = np.meshgrid(x, y)
-        self.phi = np.arctan(Y / X)
+        self.phi = np.angle(X + 1j * Y)
+        self.k = 2 * np.pi / self.lam
+        self.z_R = self.k * (self.w0**2) / 2
 
-        if self.z==0:
-            self.A = np.sqrt((2 / np.pi) * (fact(self.p) / fact(self.p + np.abs(self.l)))) * (-1)**self.p / self.w0
-
-            Beam = self.A * (np.sqrt(2 * (X**2 + Y**2)) / self.w0)**(self.l) * genlaguerre(self.p, self.l)(2 * (X**2 + Y**2) / self.w0**2) * exp(-(X**2 + Y**2) / self.w0**2) * exp(-1j * self.l * self.phi)
-        elif self.z>0:
-            self.R = self.z_R * ((self.z / self.z_R) + (self.z_R / self.z))
+        if self.z>=0:
         
             self.w = self.w0 * np.sqrt(1 + (self.z / self.z_R)**2)
 
-            self.A = np.sqrt((2 / np.pi) * (fact(self.p) / fact(self.p + np.abs(self.l)))) * (-1)**self.p / self.w
+            self.A = np.sqrt((2 / np.pi) * (fact(self.p) / fact(self.p + np.abs(self.l)))) / self.w
 
-            Beam = self.A * (np.sqrt(2 * (X**2 + Y**2)) / self.w)**(np.abs(self.l)) * genlaguerre(self.p, np.abs(self.l))(2 * (X**2 + Y**2) / self.w**2) * exp(-(X**2 + Y**2) / self.w**2) * exp(-1j * (self.k * (X**2 + Y**2) * self.z / (2 * (self.z**2 + self.z_R**2)) - (2 * self.p + self.l + 1) * np.arctan(self.z / self.z_R) + self.l * self.phi))
+            phase = -1 * (self.k * (X**2 + Y**2) * self.z / (2 * (self.z**2 + self.z_R**2)) - (2 * self.p + self.l + 1) * np.arctan(self.z / self.z_R) + self.l * self.phi)
+
+            Beam = self.A * (np.sqrt(2 * (X**2 + Y**2)) / self.w)**(np.abs(self.l)) * genlaguerre(self.p, np.abs(self.l))(2 * (X**2 + Y**2) / self.w**2) * exp(-(X**2 + Y**2) / self.w**2) * exp(1j * phase)
         else:
-            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0)
+            phase = 0
+            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0) * exp(1j * phase)
+
         return Beam
         
     
 
 if __name__ == "__main__":
-    range = 1e-3
+    
+    range = 2e-3
     resolution = 1024
     w0=1e-3
     lam=632.8e-9
-    z=0.16
+    z=0.
     G_Beam = G_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam)
     G_Beam.rasterized_Beam()
     G_Beam.plot_intensity()
@@ -133,9 +141,9 @@ if __name__ == "__main__":
     resolution = 1024
     w0=1e-3
     lam=632.8e-9
-    z=1.
+    z=0.
     l = 3
-    p = 1
+    p = 0
     LG_Beam = LG_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam, l=l, p=p)
     LG_Beam.rasterized_Beam()
     LG_Beam.plot_intensity()
