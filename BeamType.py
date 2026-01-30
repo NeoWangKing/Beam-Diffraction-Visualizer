@@ -122,34 +122,37 @@ class Laguerre_Gaussian_Beam(Beam):
             Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0) * np.exp(1j * phase)
 
         return Beam
-        
-if __name__ == "__main__":
-    line = 3
-    column = 2
 
+def show_beam_examples():
+    line = 2
+    column = 3
+
+    num = 1
     range = 2e-3
     resolution = 1024
     lam=632.8e-9
     z=0.
-    Beam = Beam(range=range, resolution=resolution, z=z, lam=lam)
-    Beam.rasterized_Beam()
-    plt.subplot(line, column, 1)
-    Beam.plot_intensity()
-    plt.subplot(line, column, 2)
-    Beam.plot_phase()
+    beam = Beam(range=range, resolution=resolution, z=z, lam=lam)
+    beam.rasterized_Beam()
+    plt.subplot(line, column, num)
+    beam.plot_intensity()
+    plt.subplot(line, column, num + column)
+    beam.plot_phase()
     
+    num = 2
     range = 2e-3
     resolution = 1024
     w0=1e-3
     lam=632.8e-9
     z=0.
-    Gaussian_Beam = Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam)
-    Gaussian_Beam.rasterized_Beam()
-    plt.subplot(line, column, 3)
-    Gaussian_Beam.plot_intensity()
-    plt.subplot(line, column, 4)
-    Gaussian_Beam.plot_phase()
+    gaussian_beam = Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam)
+    gaussian_beam.rasterized_Beam()
+    plt.subplot(line, column, num)
+    gaussian_beam.plot_intensity()
+    plt.subplot(line, column, num + column)
+    gaussian_beam.plot_phase()
 
+    num = 3
     range = 2e-3
     resolution = 1024
     w0=1e-3
@@ -157,12 +160,15 @@ if __name__ == "__main__":
     z=0.
     l = 3
     p = 0
-    Laguerre_Gaussian_Beam = Laguerre_Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam, l=l, p=p)
-    Laguerre_Gaussian_Beam.rasterized_Beam()
-    plt.subplot(line, column, 5)
-    Laguerre_Gaussian_Beam.plot_intensity()
-    plt.subplot(line, column, 6)
-    Laguerre_Gaussian_Beam.plot_phase()
+    laguerre_gaussian_beam = Laguerre_Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam, l=l, p=p)
+    laguerre_gaussian_beam.rasterized_Beam()
+    plt.subplot(line, column, num)
+    laguerre_gaussian_beam.plot_intensity()
+    plt.subplot(line, column, num + column)
+    laguerre_gaussian_beam.plot_phase()
 
     plt.show()
     pass
+
+if __name__ == "__main__":
+    show_beam_examples()
