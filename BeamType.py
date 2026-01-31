@@ -11,21 +11,27 @@ def fact(n):
 def get_beam_list():
     return ["basic", "gaussian", "laguerre-gaussian"]
 
+def var_key():
+    return{"Value":0, "Parameter":1, "Unit":2}
+
 #create a basic Beam class
 class Beam:
     def __init__(self, range=1e-3, resolution=1024, z=0., lam=632.8e-9):
-        self.beamtype = "Basic Beam"
-        self.range = range
-        self.resolution = resolution
-        self.z = z
-        self.lam = lam
+        self.beamtype = ["Basic Beam", "Beam Type", ""]
+        self.range = [range, "Render Range", "m"]
+        self.resolution = [resolution, "Resolution", ""]
+        self.z = [z, "Propagation Distance", "m"]
+        self.lam = [lam, "Wavelength", "nm"]
         pass
 
     def list(self):
-        print(self.beamtype, ":")
+        print(self.beamtype[0], ":")
+        print(f"{'Parameter':<25}{'Variable':<15}{'Value':<10}{'Unit'}")
         for name, value in self.__dict__.items():
-            if name != "beamtype":
-                print(f"self.{name} = {value}")
+            if name != "beamtype" and name != "lam":
+                print(f"{value[1]:<25}{'(.'+name+'): ':<15}{value[0]:<10}{value[2]}")
+            elif name == "lam":
+                print(f"{value[1]:<25}{'(.'+name+'): ':<15}{value[0]*1e9:<10}nm")
             else:
                 pass
         print("")
@@ -33,22 +39,22 @@ class Beam:
     def get_var(self):
         for name in self.__dict__:
             if name != "beamtype" and name != "lam":
-                self.__dict__[name] = eval(input(f"Enter value for {name} (current value: {self.__dict__[name]}): "))
+                self.__dict__[name][0] = eval(input(f"Enter value for {name} (current value: {self.__dict__[name][0]}): "))
             elif name == "lam":
-                self.__dict__[name] = eval(input(f"Enter value for lam(nm) (current value: {self.__dict__[name] * 1e9} nm): ")) * 1e-9
+                self.__dict__[name][0] = eval(input(f"Enter value for lam(nm) (current value: {self.__dict__[name][0] * 1e9} nm): ")) * 1e-9
             else:
                 pass
         print("Variables updated.\n")
 
 
     def rasterized_Beam(self):
-        x = np.linspace(-self.range, self.range, self.resolution)
-        y = np.linspace(-self.range, self.range, self.resolution)
+        x = np.linspace(-self.range[0], self.range[0], self.resolution[0])
+        y = np.linspace(-self.range[0], self.range[0], self.resolution[0])
         X, Y = np.meshgrid(x, y)
 
         phase = 0 * X * Y
 
-        Beam = (self.z**0) * np.exp(1j * phase)
+        Beam = (self.z[0]**0) * np.exp(1j * phase)
 
         return Beam
     
@@ -56,22 +62,22 @@ class Beam:
         self.intensity = np.abs(self.rasterized_Beam())**2
         mpltensity = np.max(self.intensity)
 
-        plt.imshow(self.intensity / mpltensity, extent=(-self.range, self.range, -self.range, self.range), cmap='inferno')
+        plt.imshow(self.intensity / mpltensity, extent=(-self.range[0], self.range[0], -self.range[0], self.range[0]), cmap='inferno')
 
         #plt.colorbar(label='Intensity')
         plt.clim(0, 1)
-        plt.title(f'{self.beamtype} Intensity Distribution')
+        plt.title(f'{self.beamtype[0]} Intensity Distribution')
         plt.xlabel('x (m)')
         plt.ylabel('y (m)')
 
     def plot_phase(self):
         self.phase = np.angle(self.rasterized_Beam())%(2 * np.pi)
 
-        plt.imshow(self.phase, extent=(-self.range, self.range, -self.range, self.range), cmap='gray')
+        plt.imshow(self.phase, extent=(-self.range[0], self.range[0], -self.range[0], self.range[0]), cmap='gray')
 
         #plt.colorbar(label='Phase')
         plt.clim(0, (2 * np.pi))
-        plt.title('Beam Phase Distribution')
+        plt.title(f'{self.beamtype[0]} Phase Distribution')
         plt.xlabel('x (m)')
         plt.ylabel('y (m)')
     
@@ -87,65 +93,63 @@ class Beam:
 class Gaussian_Beam(Beam):
     def __init__(self, range=1e-3, resolution=1024, z=0., lam=632.8e-9, w0=1e-3):
         super().__init__(range, resolution, z, lam)
-        self.beamtype = "Gaussian Beam"
-        self.w0 = w0
+        self.beamtype = ["Gaussian Beam", "Beam Type", ""]
+        self.w0 = [w0, "Beam Waist", "m"]
         pass
     
     def rasterized_Beam(self):
-        x = np.linspace(-self.range, self.range, self.resolution)
-        y = np.linspace(-self.range, self.range, self.resolution)
+        x = np.linspace(-self.range[0], self.range[0], self.resolution[0])
+        y = np.linspace(-self.range[0], self.range[0], self.resolution[0])
         X, Y = np.meshgrid(x, y)
         self.phi = np.angle(X + 1j * Y)
-        self.k = 2 * np.pi / self.lam
-        self.z_R = self.k * (self.w0**2) / 2
+        self.k = 2 * np.pi / self.lam[0]
+        self.z_R = self.k * (self.w0[0]**2) / 2
 
-        if self.z==0:
-            phase = (self.k * self.z - self.phi) * (X / X)
-
-            Beam = np.exp(-(X**2 + Y**2) / self.w0**2) * np.exp(1j * phase)
-        elif self.z>0:
-            self.R = self.z_R * ((self.z / self.z_R) + (self.z_R / self.z))
+        if self.z[0]==0:
+            phase = (self.k * self.z[0] - self.phi) * (X / X)
+            Beam = np.exp(-(X**2 + Y**2) / self.w0[0]**2) * np.exp(1j * phase)
+        elif self.z[0]>0:
+            self.R = self.z_R * ((self.z[0] / self.z_R) + (self.z_R / self.z[0]))
         
-            self.w = self.w0 * np.sqrt(1 + (self.z / self.z_R)**2)
+            self.w = self.w0[0] * np.sqrt(1 + (self.z[0] / self.z_R)**2)
 
-            phase = (self.k * (X**2 + Y**2) / (2 * self.R) - self.phi + self.k * self.z)
+            phase = (self.k * (X**2 + Y**2) / (2 * self.R) - self.phi + self.k * self.z[0])
 
-            Beam = (self.w0 / self.w) * np.exp(-(X**2 + Y**2) / self.w**2) * np.exp(1j * phase)
+            Beam = (self.w0[0] / self.w) * np.exp(-(X**2 + Y**2) / self.w**2) * np.exp(1j * phase)
         else:
             phase = 0
-            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0) * np.exp(1j * phase)
-
+            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z[0]**0) * np.exp(1j * phase)
         return Beam
 
 class Laguerre_Gaussian_Beam(Beam):
     def __init__(self, range=0.001, resolution=1024, z=0, lam=6.328e-7, l=1, p=0, w0=1e-3):
         super().__init__(range, resolution, z, lam)
-        self.beamtype = "Laguerre-Gaussian Beam"
-        self.w0 = w0
-        self.l = l
-        self.p = p
+        self.beamtype = ["Laguerre-Gaussian Beam", "Beam Type", ""]
+        self.w0 = [w0, "Beam Waist", "m"]
+        self.l = [l, "Azimuthal Index", ""]
+        self.p = [p, "Radial Index", ""]
         pass
 
     def rasterized_Beam(self):
-        x = np.linspace(-self.range, self.range, self.resolution)
-        y = np.linspace(-self.range, self.range, self.resolution)
+        x = np.linspace(-self.range[0], self.range[0], self.resolution[0])
+        y = np.linspace(-self.range[0], self.range[0], self.resolution[0])
         X, Y = np.meshgrid(x, y)
         self.phi = np.angle(X + 1j * Y)
-        self.k = 2 * np.pi / self.lam
-        self.z_R = self.k * (self.w0**2) / 2
+        self.k = 2 * np.pi / self.lam[0]
+        self.z_R = self.k * (self.w0[0]**2) / 2
 
-        if self.z>=0:
+        if self.z[0]>=0:
         
-            self.w = self.w0 * np.sqrt(1 + (self.z / self.z_R)**2)
+            self.w = self.w0[0] * np.sqrt(1 + (self.z[0] / self.z_R)**2)
 
-            self.A = np.sqrt((2 / np.pi) * (fact(self.p) / fact(self.p + np.abs(self.l)))) / self.w
+            self.A = np.sqrt((2 / np.pi) * (fact(self.p[0]) / fact(self.p[0] + np.abs(self.l[0])))) / self.w
 
-            phase = -1 * (self.k * (X**2 + Y**2) * self.z / (2 * (self.z**2 + self.z_R**2)) - (2 * self.p + self.l + 1) * np.arctan(self.z / self.z_R) + self.l * self.phi)
+            phase = -1 * (self.k * (X**2 + Y**2) * self.z[0] / (2 * (self.z[0]**2 + self.z_R**2)) - (2 * self.p[0] + self.l[0] + 1) * np.arctan(self.z[0] / self.z_R) + self.l[0] * self.phi)
 
-            Beam = self.A * (np.sqrt(2 * (X**2 + Y**2)) / self.w)**(np.abs(self.l)) * genlaguerre(self.p, np.abs(self.l))(2 * (X**2 + Y**2) / self.w**2) * np.exp(-(X**2 + Y**2) / self.w**2) * np.exp(1j * phase)
+            Beam = self.A * (np.sqrt(2 * (X**2 + Y**2)) / self.w)**(np.abs(self.l[0])) * genlaguerre(self.p[0], np.abs(self.l[0]))(2 * (X**2 + Y**2) / self.w**2) * np.exp(-(X**2 + Y**2) / self.w**2) * np.exp(1j * phase)
         else:
             phase = 0
-            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z**0) * np.exp(1j * phase)
+            Beam = ((X + 1j * Y) / (X + 1j * Y)) * (self.z[0]**0) * np.exp(1j * phase)
 
         return Beam
 
