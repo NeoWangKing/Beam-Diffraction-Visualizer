@@ -12,6 +12,8 @@ main file
 the types of beam
 ├── README.md
 instructions
+├── requirements.txt
+the requirements of libraries for python
 ```
 
 ## Features
