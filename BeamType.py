@@ -16,7 +16,17 @@ class Beam:
         self.resolution = resolution
         self.z = z
         self.lam = lam
+
+        self.beamtype = "Basic Beam"
         pass
+
+    def list(self):
+        print("Beam Type(.beamtype): ", self.beamtype)
+        print("Plot Range(.range): ", self.range)
+        print("Resolution(.resolution): ", self.resolution)
+        print("Propagation Distance(.z): ", self.z)
+        print("Wavelength(.lam): ", self.lam)
+        print("\n")
 
     def rasterized_Beam(self):
         x = np.linspace(-self.range, self.range, self.resolution)
@@ -36,7 +46,7 @@ class Beam:
 
         plt.imshow(self.intensity / mpltensity, extent=(-self.range, self.range, -self.range, self.range), cmap='inferno')
 
-        plt.colorbar(label='Intensity', ticks=[0, 0.25, 0.5, 0.75, 1])
+        #plt.colorbar(label='Intensity')
         plt.clim(0, 1)
         plt.title('Beam Intensity Distribution')
         plt.xlabel('x (m)')
@@ -47,21 +57,37 @@ class Beam:
 
         plt.imshow(self.phase, extent=(-self.range, self.range, -self.range, self.range), cmap='gray')
 
-        plt.colorbar(label='Phase')
+        #plt.colorbar(label='Phase')
         plt.clim(0, (2 * np.pi))
         plt.title('Beam Phase Distribution')
         plt.xlabel('x (m)')
         plt.ylabel('y (m)')
+    
+    def show_beam_examples(self):
+        plt.subplot(1,2,1)
+        self.plot_intensity()
+        plt.subplot(1,2,2)
+        self.plot_phase()
+        plt.show()
+        pass
 
 #create the Gaussian_Beam class
 class Gaussian_Beam(Beam):
     def __init__(self, range=1e-3, resolution=1024, z=0., lam=632.8e-9, w0=1e-3):
         super().__init__(range, resolution, z, lam)
-
         self.w0 = w0
-        
-        self.Beam = self.rasterized_Beam()
+
+        self.beamtype = "Gaussian Beam"
         pass
+    
+    def list(self):
+        print("Beam Type(.beamtype): ", self.beamtype)
+        print("Plot Range(.range): ", self.range)
+        print("Resolution(.resolution): ", self.resolution)
+        print("Propagation Distance(.z): ", self.z)
+        print("Wavelength(.lam): ", self.lam)
+        print("Waist Radius(.w0): ", self.w0)
+        print("\n")
     
     def rasterized_Beam(self):
         x = np.linspace(-self.range, self.range, self.resolution)
@@ -92,13 +118,23 @@ class Gaussian_Beam(Beam):
 class Laguerre_Gaussian_Beam(Beam):
     def __init__(self, range=0.001, resolution=1024, z=0, lam=6.328e-7, l=1, p=0, w0=1e-3):
         super().__init__(range, resolution, z, lam)
-
+        self.w0 = w0
         self.l = l
         self.p = p
-        self.w0 = w0
         
-        self.Beam = self.rasterized_Beam()
+        self.beamtype = "Laguerre-Gaussian Beam"
         pass
+    
+    def list(self):
+        print("Beam Type(.beamtype): ", self.beamtype)
+        print("Plot Range(.range): ", self.range)
+        print("Resolution(.resolution): ", self.resolution)
+        print("Propagation Distance(.z): ", self.z)
+        print("Wavelength(.lam): ", self.lam)
+        print("Waist Radius(.w0): ", self.w0)
+        print("Azimuthal Index(.l): ", self.l)
+        print("Radial Index(.p): ", self.p)
+        print("\n")
 
     def rasterized_Beam(self):
         x = np.linspace(-self.range, self.range, self.resolution)
@@ -123,16 +159,13 @@ class Laguerre_Gaussian_Beam(Beam):
 
         return Beam
 
-def show_beam_examples():
+def show_beam_test(range=2e-3, resolution=1024, lam=632.8e-9, z=0., w0=1e-3, l = 1, p = 0):
     line = 2
     column = 3
 
     num = 1
-    range = 2e-3
-    resolution = 1024
-    lam=632.8e-9
-    z=0.
     beam = Beam(range=range, resolution=resolution, z=z, lam=lam)
+    #beam.list()
     beam.rasterized_Beam()
     plt.subplot(line, column, num)
     beam.plot_intensity()
@@ -140,12 +173,8 @@ def show_beam_examples():
     beam.plot_phase()
     
     num = 2
-    range = 2e-3
-    resolution = 1024
-    w0=1e-3
-    lam=632.8e-9
-    z=0.
     gaussian_beam = Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam)
+    #gaussian_beam.list()
     gaussian_beam.rasterized_Beam()
     plt.subplot(line, column, num)
     gaussian_beam.plot_intensity()
@@ -153,14 +182,8 @@ def show_beam_examples():
     gaussian_beam.plot_phase()
 
     num = 3
-    range = 2e-3
-    resolution = 1024
-    w0=1e-3
-    lam=632.8e-9
-    z=0.
-    l = 3
-    p = 0
     laguerre_gaussian_beam = Laguerre_Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam, l=l, p=p)
+    #laguerre_gaussian_beam.list()
     laguerre_gaussian_beam.rasterized_Beam()
     plt.subplot(line, column, num)
     laguerre_gaussian_beam.plot_intensity()
@@ -171,4 +194,11 @@ def show_beam_examples():
     pass
 
 if __name__ == "__main__":
-    show_beam_examples()
+    range = 2e-3
+    resolution = 1024
+    lam=632.8e-9
+    z=0.2
+    w0=1e-3
+    l = 1
+    p = 0
+    show_beam_test(range=range, resolution=resolution, lam=lam, z=z, w0=w0, l=l, p=p)
