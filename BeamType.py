@@ -9,24 +9,38 @@ def fact(n):
     else:
         return n * fact(n - 1)
 
+def get_beam_list():
+    return ["basic", "gaussian", "laguerre-gaussian"]
+
 #create a basic Beam class
 class Beam:
     def __init__(self, range=1e-3, resolution=1024, z=0., lam=632.8e-9):
+        self.beamtype = "Basic Beam"
         self.range = range
         self.resolution = resolution
         self.z = z
         self.lam = lam
-
-        self.beamtype = "Basic Beam"
         pass
 
     def list(self):
-        print("Beam Type(.beamtype): ", self.beamtype)
-        print("Plot Range(.range): ", self.range)
-        print("Resolution(.resolution): ", self.resolution)
-        print("Propagation Distance(.z): ", self.z)
-        print("Wavelength(.lam): ", self.lam)
-        print("\n")
+        print(self.beamtype, ":")
+        for name, value in self.__dict__.items():
+            if name != "beamtype":
+                print(f"self.{name} = {value}")
+            else:
+                pass
+        print("")
+
+    def get_var(self):
+        for name in self.__dict__:
+            if name != "beamtype" and name != "lam":
+                self.__dict__[name] = eval(input(f"Enter value for {name} (current value: {self.__dict__[name]}): "))
+            elif name == "lam":
+                self.__dict__[name] = eval(input(f"Enter value for lam(nm) (current value: {self.__dict__[name] * 1e9} nm): ")) * 1e-9
+            else:
+                pass
+        print("Variables updated.\n")
+
 
     def rasterized_Beam(self):
         x = np.linspace(-self.range, self.range, self.resolution)
@@ -40,8 +54,7 @@ class Beam:
         return Beam
     
     def plot_intensity(self):
-        self.Beam = self.rasterized_Beam()
-        self.intensity = np.abs(self.Beam)**2
+        self.intensity = np.abs(self.rasterized_Beam())**2
         mpltensity = np.max(self.intensity)
 
         plt.imshow(self.intensity / mpltensity, extent=(-self.range, self.range, -self.range, self.range), cmap='inferno')
@@ -75,19 +88,9 @@ class Beam:
 class Gaussian_Beam(Beam):
     def __init__(self, range=1e-3, resolution=1024, z=0., lam=632.8e-9, w0=1e-3):
         super().__init__(range, resolution, z, lam)
-        self.w0 = w0
-
         self.beamtype = "Gaussian Beam"
+        self.w0 = w0
         pass
-    
-    def list(self):
-        print("Beam Type(.beamtype): ", self.beamtype)
-        print("Plot Range(.range): ", self.range)
-        print("Resolution(.resolution): ", self.resolution)
-        print("Propagation Distance(.z): ", self.z)
-        print("Wavelength(.lam): ", self.lam)
-        print("Waist Radius(.w0): ", self.w0)
-        print("\n")
     
     def rasterized_Beam(self):
         x = np.linspace(-self.range, self.range, self.resolution)
@@ -118,23 +121,11 @@ class Gaussian_Beam(Beam):
 class Laguerre_Gaussian_Beam(Beam):
     def __init__(self, range=0.001, resolution=1024, z=0, lam=6.328e-7, l=1, p=0, w0=1e-3):
         super().__init__(range, resolution, z, lam)
+        self.beamtype = "Laguerre-Gaussian Beam"
         self.w0 = w0
         self.l = l
         self.p = p
-        
-        self.beamtype = "Laguerre-Gaussian Beam"
         pass
-    
-    def list(self):
-        print("Beam Type(.beamtype): ", self.beamtype)
-        print("Plot Range(.range): ", self.range)
-        print("Resolution(.resolution): ", self.resolution)
-        print("Propagation Distance(.z): ", self.z)
-        print("Wavelength(.lam): ", self.lam)
-        print("Waist Radius(.w0): ", self.w0)
-        print("Azimuthal Index(.l): ", self.l)
-        print("Radial Index(.p): ", self.p)
-        print("\n")
 
     def rasterized_Beam(self):
         x = np.linspace(-self.range, self.range, self.resolution)
@@ -165,8 +156,7 @@ def show_beam_test(range=2e-3, resolution=1024, lam=632.8e-9, z=0., w0=1e-3, l =
 
     num = 1
     beam = Beam(range=range, resolution=resolution, z=z, lam=lam)
-    #beam.list()
-    beam.rasterized_Beam()
+    beam.list()
     plt.subplot(line, column, num)
     beam.plot_intensity()
     plt.subplot(line, column, num + column)
@@ -174,8 +164,7 @@ def show_beam_test(range=2e-3, resolution=1024, lam=632.8e-9, z=0., w0=1e-3, l =
     
     num = 2
     gaussian_beam = Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam)
-    #gaussian_beam.list()
-    gaussian_beam.rasterized_Beam()
+    gaussian_beam.list()
     plt.subplot(line, column, num)
     gaussian_beam.plot_intensity()
     plt.subplot(line, column, num + column)
@@ -183,8 +172,7 @@ def show_beam_test(range=2e-3, resolution=1024, lam=632.8e-9, z=0., w0=1e-3, l =
 
     num = 3
     laguerre_gaussian_beam = Laguerre_Gaussian_Beam(range=range, resolution=resolution, z=z, w0=w0, lam=lam, l=l, p=p)
-    #laguerre_gaussian_beam.list()
-    laguerre_gaussian_beam.rasterized_Beam()
+    laguerre_gaussian_beam.list()
     plt.subplot(line, column, num)
     laguerre_gaussian_beam.plot_intensity()
     plt.subplot(line, column, num + column)
@@ -197,7 +185,7 @@ if __name__ == "__main__":
     range = 2e-3
     resolution = 1024
     lam=632.8e-9
-    z=0.2
+    z=1
     w0=1e-3
     l = 1
     p = 0

@@ -34,7 +34,7 @@ To start the application, run:
 python main.py
 ```
 
-make sure the parameters in `main.py` have been adjusted to the required values
+follow the instructions provided.
 
 ## Contributing
 
