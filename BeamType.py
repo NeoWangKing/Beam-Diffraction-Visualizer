@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 from scipy.special import genlaguerre
 
 def fact(n):
@@ -61,7 +60,7 @@ class Beam:
 
         #plt.colorbar(label='Intensity')
         plt.clim(0, 1)
-        plt.title('Beam Intensity Distribution')
+        plt.title(f'{self.beamtype} Intensity Distribution')
         plt.xlabel('x (m)')
         plt.ylabel('y (m)')
 
@@ -187,6 +186,6 @@ if __name__ == "__main__":
     lam=632.8e-9
     z=1
     w0=1e-3
-    l = 1
-    p = 0
+    l = 3
+    p = 1
     show_beam_test(range=range, resolution=resolution, lam=lam, z=z, w0=w0, l=l, p=p)
