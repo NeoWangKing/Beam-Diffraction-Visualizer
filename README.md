@@ -14,6 +14,8 @@ the types of beam
 instructions
 ├── requirements.txt
 the requirements of libraries for python
+├── cmd.py
+execute in a new window
 ```
 
 ## Features
