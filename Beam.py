@@ -16,7 +16,7 @@ def var_key():
 
 #create a basic Beam class
 class Beam:
-    def __init__(self, plotrange=1e-3, resolution=1024, z=0., lam=632.8e-9):
+    def __init__(self, plotrange=1e-2, resolution=1024, z=0., lam=632.8e-9):
         self.beamtype = ["Basic Beam", "Beam Type", ""]
         self.plotrange = [plotrange, "Render plotRange", "m"]
         self.resolution = [resolution, "Resolution", "pixels"]
@@ -89,7 +89,7 @@ class Beam:
 
 #create the Gaussian_Beam class
 class Gaussian_Beam(Beam):
-    def __init__(self, plotrange=1e-3, resolution=1024, z=0., lam=632.8e-9, w0=1e-3):
+    def __init__(self, plotrange=1e-2, resolution=1024, z=0., lam=632.8e-9, w0=1e-2):
         super().__init__(plotrange, resolution, z, lam)
         self.beamtype = ["Gaussian Beam", "Beam Type", ""]
         self.w0 = [w0, "Beam Waist", "m"]
@@ -120,7 +120,7 @@ class Gaussian_Beam(Beam):
         return Beam
 
 class Laguerre_Gaussian_Beam(Beam):
-    def __init__(self, plotrange=0.001, resolution=1024, z=0, lam=6.328e-7, l=1, p=0, w0=1e-3):
+    def __init__(self, plotrange=1e-2, resolution=1024, z=0, lam=632.8e-9, l=1, p=0, w0=1e-2):
         super().__init__(plotrange, resolution, z, lam)
         self.beamtype = ["Laguerre-Gaussian Beam", "Beam Type", ""]
         self.w0 = [w0, "Beam Waist", "m"]
@@ -151,7 +151,7 @@ class Laguerre_Gaussian_Beam(Beam):
 
         return Beam
 
-def show_beam_test(plotrange=2e-3, resolution=1024, lam=632.8e-9, z=0., w0=1e-3, l = 1, p = 0):
+def show_beam_test(plotrange=1e-2, resolution=1024, lam=632.8e-9, z=0., w0=1e-2, l = 1, p = 0):
     line = 2
     column = 3
 
@@ -183,11 +183,11 @@ def show_beam_test(plotrange=2e-3, resolution=1024, lam=632.8e-9, z=0., w0=1e-3,
     pass
 
 if __name__ == "__main__":
-    plotrange = 2e-3
+    plotrange = 1e-2
     resolution = 1024
     lam=632.8e-9
     z=1
-    w0=1e-3
+    w0=1e-2
     l = 3
     p = 1
     show_beam_test(plotrange=plotrange, resolution=resolution, lam=lam, z=z, w0=w0, l=l, p=p)

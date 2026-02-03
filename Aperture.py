@@ -8,7 +8,7 @@ def var_key():
     return{"Value":0, "Parameter":1, "Unit":2}
 
 class Aperture:
-    def __init__(self, plotrange=1e-3, resolution=1024):
+    def __init__(self, plotrange=1e-2, resolution=1024):
         self.aperturetype = ["Generic Aperture", "Aperture Type", ""]
         self.plotrange = [plotrange, "Render plotRange", "m"]
         self.resolution = [resolution, "Resolution", "pixels"]
@@ -49,7 +49,7 @@ class Aperture:
         plt.ylabel("y (m)")
 
 class Circular_Aperture(Aperture):
-    def __init__(self, plotrange=1e-3, resolution=1024, radius=0.5e-3):
+    def __init__(self, plotrange=1e-2, resolution=1024, radius=5e-3):
         super().__init__(plotrange, resolution)
         self.aperturetype = ["Circular Aperture", "Aperture Type", ""]
         self.radius = [radius, "Radius", "m"]
@@ -65,7 +65,7 @@ class Circular_Aperture(Aperture):
         return aperture
     
 class Rectangular_Aperture(Aperture):
-    def __init__(self, plotrange=1e-3, resolution=1024, width=0.5e-3, height=0.5e-3):
+    def __init__(self, plotrange=1e-2, resolution=1024, width=6e-3, height=4e-3):
         super().__init__(plotrange, resolution)
         self.aperturetype = ["Rectangular Aperture", "Aperture Type", ""]
         self.width = [width, "Width", "m"]
@@ -80,12 +80,12 @@ class Rectangular_Aperture(Aperture):
         return aperture
     
 class Fresnel_half_wave_zone(Aperture):
-    def __init__(self, plotrange=1e-3, resolution=1024, half_lam_radius=0.3e-3, n_zones=10, type=0):
+    def __init__(self, plotrange=1e-2, resolution=1024, HL_radius=3e-3, n_zones=10, type=0):
         super().__init__(plotrange, resolution)
         self.aperturetype = ["Fresnel Half-Wave Zone Aperture", "Aperture Type", ""]
-        self.half_lam_radius = [half_lam_radius, "Half Wavelength Radius", "m"]
+        self.HL_radius = [HL_radius, "Half Wavelength Radius", "m"]
         self.n_zones = [n_zones, "Number of Zones", ""]
-        self.type = [type, "Aperture Type (0: type-0, 1: type-1)", ""]
+        self.type = [type, "Aperture Type", ""]
 
     def rasterized(self):
         x = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
@@ -95,24 +95,24 @@ class Fresnel_half_wave_zone(Aperture):
         R = np.sqrt(X**2 + Y**2)
         aperture = np.zeros_like(R)
 
-        if n_zones >= 0:
+        if self.n_zones[0] >= 0:
             for n in range(0, int(self.n_zones[0])):
-                r_inner = np.sqrt(n) * self.half_lam_radius[0]
-                r_outer = np.sqrt(n + 1) * self.half_lam_radius[0]
+                r_inner = np.sqrt(n) * self.HL_radius[0]
+                r_outer = np.sqrt(n + 1) * self.HL_radius[0]
                 aperture += np.where((R >= r_inner) & (R < r_outer), (n + 1 + self.type[0]) % 2, 0)
                 if r_inner > (self.plotrange[0] * np.sqrt(2)):
                     break
         else:
             n = 0
-            while np.sqrt(n) * self.half_lam_radius[0] < (self.plotrange[0] * np.sqrt(2)):
-                r_inner = np.sqrt(n) * self.half_lam_radius[0]
-                r_outer = np.sqrt(n + 1) * self.half_lam_radius[0]
+            while np.sqrt(n) * self.HL_radius[0] < (self.plotrange[0] * np.sqrt(2)):
+                r_inner = np.sqrt(n) * self.HL_radius[0]
+                r_outer = np.sqrt(n + 1) * self.HL_radius[0]
                 aperture += np.where((R >= r_inner) & (R < r_outer), (n + 1 + self.type[0]) % 2, 0)
                 n += 1
 
         return aperture
 
-def show_aperture_test(plotrange=1e-3, resolution=1024, radius=0.5e-3, width=0.5e-3, height=0.5e-3, half_lam_radius=0.3e-3, n_zones=10, type=0):
+def show_aperture_test(plotrange=1e-2, resolution=1024, radius=5e-3, width=6e-3, height=4e-3, HL_radius=3e-3, n_zones=10, type=0):
     line = 2
     column = 2
 
@@ -140,10 +140,10 @@ def show_aperture_test(plotrange=1e-3, resolution=1024, radius=0.5e-3, width=0.5
     aperture.plot_aperture()
 
     num += 1
-    half_lam_radius = half_lam_radius
+    HL_radius = HL_radius
     n_zones = n_zones
     type = type
-    aperture = Fresnel_half_wave_zone(plotrange=plotrange, resolution=resolution, half_lam_radius=half_lam_radius, n_zones=n_zones, type=type)
+    aperture = Fresnel_half_wave_zone(plotrange=plotrange, resolution=resolution, HL_radius=HL_radius, n_zones=n_zones, type=type)
     aperture.list()
     plt.subplot(line, column, num)
     aperture.plot_aperture()
@@ -152,12 +152,12 @@ def show_aperture_test(plotrange=1e-3, resolution=1024, radius=0.5e-3, width=0.5
     pass
 
 if __name__ == "__main__":
-    plotrange = 1e-3
+    plotrange = 1e-2
     resolution = 1024
-    radius = 0.5e-3
-    width = 0.5e-3
-    height = 0.5e-3
-    half_lam_radius = 0.3e-3
+    radius = 5e-3
+    width = 6e-3
+    height = 4e-3
+    HL_radius = 3e-3
     n_zones = 10
     type = 0
-    show_aperture_test(plotrange=plotrange, resolution=resolution,radius=radius, width=width, height=height, half_lam_radius=half_lam_radius, n_zones=n_zones, type=type)
+    show_aperture_test(plotrange=plotrange, resolution=resolution,radius=radius, width=width, height=height, HL_radius=HL_radius, n_zones=n_zones, type=type)

@@ -55,7 +55,7 @@ if __name__ == "__main__":
             elif aperturetype == "rectangular" or aperturetype == "1":
                 Aperture = ap.Rectangular_Aperture()
             elif aperturetype == "fresnel half-wave zone" or aperturetype == "2":
-                Aperture = ap.Fresnel_Half_Wave_Zone_Aperture()
+                Aperture = ap.Fresnel_half_wave_zone()
             else:
                 print("Invalid input. Please select a valid aperture type.")
                 continue
@@ -78,7 +78,14 @@ if __name__ == "__main__":
                     #Aperture.list()
                     break
 
-            distance = eval(input("Enter propagation distance for diffraction (m): "))
+            
+            distance_str = input("Enter propagation distance for diffraction (m): ")
+            while 1:
+                if distance_str.strip().lower().isdigit():
+                    distance = eval(distance_str)
+                    break
+                else:
+                    distance_str = input("Invalid input. Please enter a numeric value for propagation distance (m): ")
             print("Variables Updated.\n")
 
             Beam.list()
