@@ -1,4 +1,4 @@
-import BeamType as bt
+import Beam as bt
 import Aperture as ap
 import Diffraction as df
 import matplotlib.pyplot as plt

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import BeamType as bt
+import Beam as bt
 import Aperture as ap
 import time
 
