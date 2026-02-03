@@ -44,7 +44,7 @@ class Diffraction:
                 r_ij = np.sqrt((X - X[i, j])**2 + (Y - Y[i, j])**2 + self.distance**2)
                 U_out[i, j] = np.sum(U_0 * (np.exp(1j * k * r_ij) / r_ij)) * ( (2 * self.plotrange[0]) / self.resolution[0])**2
                 progress = (i * self.resolution[0] + j + 1)
-                print(f"\rComputing Progress: {(progress / (self.resolution[0]**2) * 100):.2f}({progress}/{self.resolution[0]**2})%", end="")
+                print(f"\rComputing Progress: {(progress / (self.resolution[0]**2) * 100):.2f}%({progress}/{self.resolution[0]**2})", end="")
         print("\nDiffraction computation complete.")
         return U_out
 
