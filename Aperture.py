@@ -1,6 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def get_aperture_list():
+    return ["generic", "circular", "rectangular", "fresnel-half-wave-zone"]
+
+def var_key():
+    return{"Value":0, "Parameter":1, "Unit":2}
+
 class Aperture:
     def __init__(self, plotrange=1e-3, resolution=1024):
         self.aperturetype = ["Generic Aperture", "Aperture Type", ""]
