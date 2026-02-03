@@ -25,8 +25,10 @@ if __name__ == "__main__":
             continue
 
         temp = "n"
+        Beam.list()
         while temp != "y" and temp != "yes":
             temp = input("Use default variables? (y/n): ").strip().lower()
+            print("")
             if temp == "n" or temp == "no":
                 for name in Beam.__dict__:
                     if name != "beamtype" and name != "lam" and name != "plotrange" and name != "resolution":
@@ -40,9 +42,8 @@ if __name__ == "__main__":
                     else:
                         pass
                 print("Variables updated.\n")
+                #Beam.list()
                 break
-        
-        Beam.list()
 
         while 1:
             aperturetype = input("Select aperture type (-1:exit, 0: circular, 1: rectangular, 2: fresnel half-wave zone): ").strip().lower()
@@ -60,6 +61,7 @@ if __name__ == "__main__":
                 continue
         
             temp = "n"
+            Aperture.list()
             while temp != "y" and temp != "yes":
                 temp = input("Use default variables? (y/n): ").strip().lower()
                 if temp == "n" or temp == "no":
@@ -73,11 +75,18 @@ if __name__ == "__main__":
                         else:
                             pass
                     print("Variables updated.\n")
+                    #Aperture.list()
                     break
-            Aperture.list()
 
             distance = eval(input("Enter propagation distance for diffraction (m): "))
-            print("Computing diffraction...")
+            print("Variables Updated.\n")
+
+            Beam.list()
+            Aperture.list()
+            print("Diffraction Parameters:")
+            print(f"{'Parameter':<25}{'Variable':<15}{'Value':<10}{'Unit'}")
+            print(f"{'Propagation distance':<25}{distance:<15}{distance:<10}{'m'}\n")
+
             diffraction = df.Diffraction(input_beam=Beam, aperture=Aperture, distance=distance)
 
             plt.subplot(2, 3, 1)
@@ -93,6 +102,7 @@ if __name__ == "__main__":
             plt.subplot(2, 3, 6)
             plt.axis('off')
             plt.suptitle("Beam Diffraction through Aperture")
+            
             print("Displaying summary plot.(please close the plot window to continue)\n")
             plt.show()
             break

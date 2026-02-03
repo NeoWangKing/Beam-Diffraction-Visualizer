@@ -18,6 +18,7 @@ class Diffraction:
         self.diffracted_field = self.compute_diffraction()
 
     def compute_diffraction(self):
+        print("Computing diffraction using Fresnel approximation...")
         U_0 = self.input_beam.rasterized() * self.aperture.rasterized()
         
         x = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
@@ -36,7 +37,7 @@ class Diffraction:
         U_out_hat = U_0_hat * H
         U_out = np.fft.ifftshift(np.fft.ifft2(U_out_hat))
 
-        print("\nDiffraction computation complete.")
+        print("Diffraction computation complete.")
         return U_out
 
     def plot_diffraction_intensity(self):
