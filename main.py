@@ -29,10 +29,7 @@ if __name__ == "__main__":
                 break
         Beam.list()
         print("Generating beam profile...")
-        plt.subplot(1, 2, 1)
-        Beam.plot_intensity()
-        plt.subplot(1, 2, 2)
-        Beam.plot_phase()
+        Beam.plot_beam()
         print("Generation complete.(please close the plot window to continue)\n")
         plt.show()
 
