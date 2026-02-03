@@ -14,25 +14,12 @@ class Diffraction:
 
         if self.input_beam.plotrange[0] != self.aperture.plotrange[0] or self.input_beam.resolution[0] != self.aperture.resolution[0]:
             raise ValueError("Input beam and aperture must have the same plotrange and resolution.")
+        
+        self.diffracted_field = self.compute_diffraction()
 
     def compute_diffraction(self):
-
+        
         '''U_0 = self.input_beam.rasterized() * self.aperture.rasterized()
-        k = 2 * np.pi / self.input_beam.lam[0]
-        
-        fx = np.fft.fftfreq(self.resolution[0], d=(2 * self.plotrange[0]) / self.resolution[0])
-        fy = np.fft.fftfreq(self.resolution[0], d=(2 * self.plotrange[0]) / self.resolution[0])
-        FX, FY = np.meshgrid(fx, fy)
-
-        H = np.exp(1j * k * self.distance) * np.exp(-1j * (np.pi * self.input_beam.lam[0] * self.distance) * (FX**2 + FY**2))
-
-        U_0_hat = np.fft.fft2(np.fft.fftshift(U_0))
-
-        U_out_hat = U_0_hat * H
-
-        U_out = np.fft.ifftshift(np.fft.ifft2(U_out_hat))'''
-        
-        U_0 = self.input_beam.rasterized() * self.aperture.rasterized()
         x = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
         y = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
         X, Y = np.meshgrid(x, y)
@@ -52,11 +39,37 @@ class Diffraction:
                 print(f"\rComputing Progress: {(progress / (self.resolution[0]**2) * 100):.2f}%({progress}/{self.resolution[0]**2}), Average: {(current - begin) / progress:.4f}s, Estimated: {int(remaining_time / 3600):.0f}h{int(remaining_time / 60 % 60):.0f}m{remaining_time % 60:.0f}s", end="")
         
         print("\nDiffraction computation complete.")
+        return U_out'''
+    
+        # 获取输入场和光栅化后的孔径
+        U_0 = self.input_beam.rasterized() * self.aperture.rasterized()
+        
+        # 定义坐标网格
+        x = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
+        y = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
+        X, Y = np.meshgrid(x, y)
+
+        # 波数
+        k = 2 * np.pi / self.input_beam.lam[0]
+
+        # 计算频率坐标
+        fx = np.fft.fftfreq(self.resolution[0], d=(2 * self.plotrange[0]) / self.resolution[0])
+        fy = np.fft.fftfreq(self.resolution[0], d=(2 * self.plotrange[0]) / self.resolution[0])
+        FX, FY = np.meshgrid(fx, fy)
+
+        # 传递函数（Transfer Function）
+        H = np.exp(1j * k * self.distance) * np.exp(-1j * (np.pi * self.input_beam.lam[0] * self.distance) * (FX**2 + FY**2))
+
+        # 计算衍射场
+        U_0_hat = np.fft.fft2(np.fft.fftshift(U_0))  # 输入场的傅里叶变换
+        U_out_hat = U_0_hat * H                     # 频域中的场
+        U_out = np.fft.ifftshift(np.fft.ifft2(U_out_hat))  # 逆傅里叶变换回到空间域
+
+        print("\nDiffraction computation complete.")
         return U_out
 
     def plot_diffraction_intensity(self):
-        diffracted_field = self.compute_diffraction()
-        intensity = np.abs(diffracted_field)**2
+        intensity = np.abs(self.diffracted_field)**2
 
         plt.imshow(intensity, extent=[-self.plotrange[0], self.plotrange[0], -self.plotrange[0], self.plotrange[0]], cmap='inferno')
         plt.clim(0, np.max(intensity))
@@ -65,8 +78,7 @@ class Diffraction:
         plt.ylabel("y (m)")
 
     def plot_diffraction_phase(self):
-        diffracted_field = self.compute_diffraction()
-        phase = np.angle(diffracted_field) % (2 * np.pi)
+        phase = np.angle(self.diffracted_field) % (2 * np.pi)
 
         plt.imshow(phase, extent=[-self.plotrange[0], self.plotrange[0], -self.plotrange[0], self.plotrange[0]], cmap='gray')
         plt.clim(0, 2 * np.pi)
@@ -74,7 +86,7 @@ class Diffraction:
         plt.xlabel("x (m)")
         plt.ylabel("y (m)")
 
-def plot_diffraction_test(plotrange=1e-3, resolution=1024, z=0.1, lam=632.8e-9, l=1, p=0, w0=0.5e-3, radius=0.3e-3, distance=1):
+def plot_diffraction_test(plotrange=1e-3, resolution=1024, z=0.1, lam=632.8e-9, radius=0.3e-3, distance=1):
     beam = bt.Beam(plotrange=plotrange, resolution=resolution, z=z, lam=lam)
 
     aperture = ap.Circular_Aperture(plotrange=plotrange, resolution=resolution, radius=radius)
@@ -96,15 +108,12 @@ def plot_diffraction_test(plotrange=1e-3, resolution=1024, z=0.1, lam=632.8e-9, 
     plt.suptitle("Beam Diffraction through Circular Aperture")
 
 if __name__ == "__main__":
-    plotrange = 1e-3
-    resolution = 1024
+    plotrange = 2e-3
+    resolution = 4096
     z = 0.1
     lam = 632.8e-9
-    w0 = 0.5e-3
-    radius = 0.05e-3
-    distance = 0.1
-    l = 3
-    p = 1
+    radius = 1e-3
+    distance = 0.5
 
-    plot_diffraction_test(plotrange=plotrange, resolution=resolution, z=z, lam=lam, w0=w0, radius=radius, distance=distance, l=l, p=p)
+    plot_diffraction_test(plotrange=plotrange, resolution=resolution, z=z, lam=lam, radius=radius, distance=distance)
     plt.show()
