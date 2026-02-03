@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import BeamType as bt
 import Aperture as ap
+import time
 
 class Diffraction:
     def __init__(self, input_beam: bt.Beam, aperture: ap.Aperture, distance=0.1):
@@ -39,12 +40,17 @@ class Diffraction:
         k = 2 * np.pi / self.input_beam.lam[0]
 
         U_out = np.zeros_like(U_0, dtype=complex)
+        begin = time.perf_counter()
         for i in range(self.resolution[0]):
             for j in range(self.resolution[0]):
                 r_ij = np.sqrt((X - X[i, j])**2 + (Y - Y[i, j])**2 + self.distance**2)
                 U_out[i, j] = np.sum(U_0 * (np.exp(1j * k * r_ij) / r_ij)) * ( (2 * self.plotrange[0]) / self.resolution[0])**2
                 progress = (i * self.resolution[0] + j + 1)
-                print(f"\rComputing Progress: {(progress / (self.resolution[0]**2) * 100):.2f}%({progress}/{self.resolution[0]**2})", end="")
+                current = time.perf_counter()
+                remaining_time = ((current - begin) / progress * (self.resolution[0]**2 - progress))
+                
+                print(f"\rComputing Progress: {(progress / (self.resolution[0]**2) * 100):.2f}%({progress}/{self.resolution[0]**2}), Average: {(current - begin) / progress:.4f}s, Estimated: {int(remaining_time / 3600):.0f}h{int(remaining_time / 60 % 60):.0f}m{remaining_time % 60:.0f}s", end="")
+        
         print("\nDiffraction computation complete.")
         return U_out
 
