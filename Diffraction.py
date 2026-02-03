@@ -18,52 +18,23 @@ class Diffraction:
         self.diffracted_field = self.compute_diffraction()
 
     def compute_diffraction(self):
-        
-        '''U_0 = self.input_beam.rasterized() * self.aperture.rasterized()
-        x = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
-        y = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
-        X, Y = np.meshgrid(x, y)
-
-        k = 2 * np.pi / self.input_beam.lam[0]
-
-        U_out = np.zeros_like(U_0, dtype=complex)
-        begin = time.perf_counter()
-        for i in range(self.resolution[0]):
-            for j in range(self.resolution[0]):
-                r_ij = np.sqrt((X - X[i, j])**2 + (Y - Y[i, j])**2 + self.distance**2)
-                U_out[i, j] = np.sum(U_0 * (np.exp(1j * k * r_ij) / r_ij)) * ( (2 * self.plotrange[0]) / self.resolution[0])**2
-                progress = (i * self.resolution[0] + j + 1)
-                current = time.perf_counter()
-                remaining_time = ((current - begin) / progress * (self.resolution[0]**2 - progress))
-                
-                print(f"\rComputing Progress: {(progress / (self.resolution[0]**2) * 100):.2f}%({progress}/{self.resolution[0]**2}), Average: {(current - begin) / progress:.4f}s, Estimated: {int(remaining_time / 3600):.0f}h{int(remaining_time / 60 % 60):.0f}m{remaining_time % 60:.0f}s", end="")
-        
-        print("\nDiffraction computation complete.")
-        return U_out'''
-    
-        # 获取输入场和光栅化后的孔径
         U_0 = self.input_beam.rasterized() * self.aperture.rasterized()
         
-        # 定义坐标网格
         x = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
         y = np.linspace(-self.plotrange[0], self.plotrange[0], self.resolution[0])
         X, Y = np.meshgrid(x, y)
 
-        # 波数
         k = 2 * np.pi / self.input_beam.lam[0]
 
-        # 计算频率坐标
         fx = np.fft.fftfreq(self.resolution[0], d=(2 * self.plotrange[0]) / self.resolution[0])
         fy = np.fft.fftfreq(self.resolution[0], d=(2 * self.plotrange[0]) / self.resolution[0])
         FX, FY = np.meshgrid(fx, fy)
 
-        # 传递函数（Transfer Function）
         H = np.exp(1j * k * self.distance) * np.exp(-1j * (np.pi * self.input_beam.lam[0] * self.distance) * (FX**2 + FY**2))
 
-        # 计算衍射场
-        U_0_hat = np.fft.fft2(np.fft.fftshift(U_0))  # 输入场的傅里叶变换
-        U_out_hat = U_0_hat * H                     # 频域中的场
-        U_out = np.fft.ifftshift(np.fft.ifft2(U_out_hat))  # 逆傅里叶变换回到空间域
+        U_0_hat = np.fft.fft2(np.fft.fftshift(U_0))
+        U_out_hat = U_0_hat * H
+        U_out = np.fft.ifftshift(np.fft.ifft2(U_out_hat))
 
         print("\nDiffraction computation complete.")
         return U_out
@@ -85,6 +56,13 @@ class Diffraction:
         plt.title("Diffracted Beam Phase")
         plt.xlabel("x (m)")
         plt.ylabel("y (m)")
+    
+    def plot_diffraction(self):
+        plt.subplot(1,2,1)
+        self.plot_diffraction_intensity()
+        plt.subplot(1,2,2)
+        self.plot_diffraction_phase()
+        pass
 
 def plot_diffraction_test(plotrange=1e-3, resolution=1024, z=0.1, lam=632.8e-9, radius=0.3e-3, distance=1):
     beam = bt.Beam(plotrange=plotrange, resolution=resolution, z=z, lam=lam)
