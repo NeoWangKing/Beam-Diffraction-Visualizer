@@ -4,6 +4,13 @@ import Diffraction as df
 import matplotlib.pyplot as plt
 import sys
 
+def is_number(s):
+    try:
+        float(s) # 尝试将字符串转换为浮点数
+        return True
+    except ValueError:
+        return False
+
 if __name__ == "__main__":
     beam_list = bt.get_beam_list()
     print("welcome to Beam Diffraction Visualizer")
@@ -81,7 +88,7 @@ if __name__ == "__main__":
             
             distance_str = input("Enter propagation distance for diffraction (m): ")
             while 1:
-                if distance_str.strip().lower().isdigit():
+                if is_number(distance_str.strip().lower()):
                     distance = eval(distance_str)
                     break
                 else:
