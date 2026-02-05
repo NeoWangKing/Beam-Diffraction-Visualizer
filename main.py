@@ -6,7 +6,7 @@ import sys
 
 def is_number(s):
     try:
-        float(s) # 尝试将字符串转换为浮点数
+        float(s)
         return True
     except ValueError:
         return False
