@@ -1,4 +1,4 @@
-# /BeamType/api.py
+# /beamtype/api.py
 
 #导入内部工具模块
 from .utils import log_info, log_warning, log_error, validate_2_num, validate_2_int, validate_2_float, validate_input, validate_non_negative

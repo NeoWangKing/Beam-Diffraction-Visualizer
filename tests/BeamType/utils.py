@@ -1,4 +1,4 @@
-# /BeamType/utils.py
+# /beamtype/utils.py
 
 def log_info(message):
     '''Log Information'''

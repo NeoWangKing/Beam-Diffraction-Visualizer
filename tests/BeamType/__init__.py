@@ -1,4 +1,4 @@
-# /BeamType/__init__.py
+# /beamtype/__init__.py
 
 # 1.批量导入 - 简化导入路径
 from .api import Plain_Beam as PBeam

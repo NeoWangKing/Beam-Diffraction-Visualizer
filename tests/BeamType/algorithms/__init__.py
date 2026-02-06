@@ -1,4 +1,4 @@
-# /BeamType/algorithms/__init__.py
+# /beamtype/algorithms/__init__.py
 
 # 1.批量导入 - 简化导入路径
 from .rasterized import Plain_Beam_rasterized as PBeam_ras
