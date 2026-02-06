@@ -31,7 +31,7 @@ def validate_2_int(data: str):
 
 def validate_2_float(data: str):
     if data.isdigit():
-        log_warning("It seems that the data is an integrate")
+        log_warning("It seems that the data is an integrate, but float is required")
     try:
         return float(data)
     except ValueError:
