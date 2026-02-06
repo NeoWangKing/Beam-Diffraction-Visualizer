@@ -3,3 +3,6 @@ bdvenv/
 
 # Previous Code
 previouscode/
+
+# Python Cache
+*.pyc
