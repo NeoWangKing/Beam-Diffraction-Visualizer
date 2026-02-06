@@ -5,4 +5,5 @@ bdvenv/
 previouscode/
 
 # Python Cache
+**/__pycache__/
 *.pyc
